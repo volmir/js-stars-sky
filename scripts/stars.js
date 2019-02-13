@@ -1,6 +1,7 @@
 
 var canvas = null;
 var ctx = null;
+
 var frames = 50;
 
 var stars = [];
@@ -25,37 +26,89 @@ function randInt(min, max) {
 }
 
 function setStars() {
-    for (let i = 0; i < 500; i++) {
-        let xPos = 1;
-        let yPos = 1;
-        if (randInt(1, 2) == 1) {
-            xPos = -1;
-        }
-        if (randInt(1, 2) == 2) {
-            yPos = -1;
-        }        
+    for (let i = 0; i < 1000; i++) {      
         stars[i] = {
-            x: xPos,
-            y: yPos,
-            speed: 1 / randInt(3, 6),
+            x: getRandCoord(),
+            y: getRandCoord(),
+            speed: getStarSpeed(),
             angle: randInt(0, 180),
+            color: getStarColor(),
         };
+
+        moveStars();
+        moveStars();
+        moveStars();
+        moveStars();
         moveStars();
     }  
 }
 
+function getRandCoord() {
+    let pos = 1;
+    if (randInt(1, 2) == 1) {
+        pos = -1;
+    }    
+    return pos;
+}
+
 function printStars() {
     for (let i = 0; i < stars.length; i++) {
-        drawBall(stars[i].x, stars[i].y, 1, '#fff');
+        drawBall(
+            stars[i].x + canvas.width / 2, 
+            stars[i].y + canvas.height / 2, 
+            1, 
+            stars[i].color,
+        );
     }
+}
+
+function getStarSpeed() {
+    return 1 / randInt(3, 6);
+}
+
+function getStarColor() {
+    
+    let colors = [
+        '#ffffff',
+        '#98a2fc',
+        '#98fcae',
+        '#e2fc98',
+        '#fcdd98',
+        '#fcaa98',
+    ];
+
+    return colors[randInt(0, 5)];
 }
 
 function moveStars() {
     for (let i = 0; i < stars.length; i++) {        
         let hypotenuse = calcHypotenuse(stars[i].speed, stars[i].angle);
         
-        stars[i].x += hypotenuse.x;
+        stars[i].speed *= 1.005;
+        
+        if (stars[i].x > 0) {
+            stars[i].x += hypotenuse.x;  
+        } else {
+            stars[i].x -= hypotenuse.x;  
+        }        
         stars[i].y += hypotenuse.y;
+        
+ 
+        if (Math.abs(stars[i].x) > canvas.width / 2 || Math.abs(stars[i].y) > canvas.height / 2) {
+            stars[i].x = getRandCoord();
+            stars[i].y = getRandCoord();
+            
+            hypotenuse = calcHypotenuse(randInt(1, canvas.width / 2), stars[i].angle);
+            if (stars[i].x > 0) {
+                stars[i].x += hypotenuse.x;  
+            } else {
+                stars[i].x -= hypotenuse.x;  
+            }        
+            stars[i].y += hypotenuse.y;
+            
+            stars[i].speed = getStarSpeed();
+        }
+
     }
 }
 
